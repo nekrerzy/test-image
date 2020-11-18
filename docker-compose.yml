@@ -1,0 +1,36 @@
+version: "3.1"
+
+services:
+  stack_db:
+    image: postgres:alpine
+    ports:
+      - "2000:5432"
+    environment:
+      POSTGRES_PASSWORD: super_complicated_password
+      POSTGRES_USER: stack_user
+      POSTGRES_DB: stack_database
+    volumes:
+      - stack_database:/var/lib/postgresql/data
+
+  stack_api:
+    # image: "node:lts-slim"
+    # working_dir: /usr/api
+    # command: npm run dev
+    # volumes:
+    #   - ./api:/usr/api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "2001:3000"
+    environment:
+      POSTGRES_HOST: stack_db
+      POSTGRES_USER: stack_user
+      POSTGRES_PASSWORD: super_complicated_password
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: stack_database
+    depends_on:
+      - stack_db
+
+volumes:
+  stack_database: {}
